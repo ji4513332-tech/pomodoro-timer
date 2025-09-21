@@ -2,159 +2,80 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>집중타이머</title>
+    <title>뽀모도로 타이머</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #fffbe6;
-            margin: 0;
-            padding: 0;
-            text-align: center;
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background: #fffbe6; }
+        .tomato {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle at 60% 40%, #ff6f61 80%, #d84315 100%);
+            border-radius: 50%;
+            margin: 0 auto 30px auto;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(255, 111, 97, 0.2);
         }
-        .tomato-emoji {
-            font-size: 70px;
-            margin-top: 40px;
-            margin-bottom: 0;
+        .stem {
+            width: 30px;
+            height: 60px;
+            background: linear-gradient(135deg, #388e3c 60%, #81c784 100%);
+            position: absolute;
+            top: -40px;
+            left: 95px;
+            border-radius: 20px 20px 0 0;
+            transform: rotate(-15deg);
         }
-        .title {
-            margin-top: 8px;
-            margin-bottom: 0;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #222;
-            letter-spacing: 2px;
-        }
-        #status {
-            font-size: 18px;
-            margin: 18px 0 10px 0;
-            color: #d84315;
-        }
+        #status { font-size: 22px; margin-bottom: 10px; color: #d84315; }
         #timer {
-            font-size: 44px;
+            font-size: 48px;
             font-weight: bold;
-            color: #ff6f61;
-            text-shadow: 2px 2px 8px #ffd6d6;
+            color: #fff;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            text-shadow: 2px 2px 8px #d84315;
             letter-spacing: 2px;
-            margin-bottom: 18px;
         }
         .btn-group {
             display: flex;
             justify-content: center;
-            gap: 16px;
-            margin-bottom: 18px;
+            gap: 20px;
+            margin-top: 30px;
         }
-        .btn-group button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            padding: 10px 18px;
+        button {
+            font-size: 18px;
+            padding: 10px 28px;
             border: none;
-            border-radius: 24px;
-            background: #ff6f61;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(255, 111, 97, 0.15);
-            transition: background 0.2s;
-            min-width: 70px;
-        }
-        .btn-group button:disabled {
-            background: #ffc1b3;
-            color: #eee;
-            cursor: not-allowed;
-        }
-        .btn-group button:hover:not(:disabled) {
-            background: #d84315;
-        }
-        .settings {
-            margin: 18px auto 0 auto;
-            background: #fffbe6;
-            border-radius: 12px;
-            padding: 14px 10px;
-            box-shadow: 0 1px 4px rgba(255, 111, 97, 0.07);
-            font-size: 15px;
-            width: 260px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .settings-row {
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-        }
-        .settings label {
-            margin-right: 4px;
-            color: #d84315;
-            font-size: 15px;
-        }
-        .settings input[type="number"] {
-            width: 48px;
-            padding: 4px;
-            border-radius: 6px;
-            border: 1px solid #ffd6d6;
-            font-size: 15px;
-            text-align: center;
-        }
-        .settings button {
-            margin-top: 6px;
-            font-size: 15px;
-            padding: 7px 18px;
-            border: none;
-            border-radius: 24px;
+            border-radius: 30px;
             background: #ff6f61;
             color: #fff;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(255, 111, 97, 0.15);
             transition: background 0.2s;
         }
-        .settings button:disabled {
+        button:disabled {
             background: #ffc1b3;
-            color: #eee;
             cursor: not-allowed;
         }
-        .settings button:hover:not(:disabled) {
+        button:hover:not(:disabled) {
             background: #d84315;
-        }
-        @media (max-width: 500px) {
-            .settings {
-                width: 90vw;
-                max-width: 340px;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="tomato-emoji">🍅</div>
-    <div class="title">집중타이머</div>
-    <div id="status">준비</div>
-    <div id="timer">30:00</div>
-    <div class="btn-group">
-        <button id="pauseBtn" disabled>
-            ⏸<span>멈춤</span>
-        </button>
-        <button id="startBtn">
-            ▶<span>시작</span>
-        </button>
-        <button id="resumeBtn" disabled>
-            ⏵<span>다시시작</span>
-        </button>
-        <button id="resetBtn">
-            🔄<span>리셋</span>
-        </button>
+    <h1>🍅 뽀모도로 타이머</h1>
+    <div class="tomato">
+        <div class="stem"></div>
+        <div id="timer">30:00</div>
     </div>
-    <form class="settings" id="settingsForm" autocomplete="off" onsubmit="return false;">
-        <div class="settings-row">
-            <label for="workInput">작업(분)</label>
-            <input type="number" id="workInput" min="1" max="120" value="30">
-            <label for="breakInput">휴식(분)</label>
-            <input type="number" id="breakInput" min="1" max="60" value="5">
-        </div>
-        <button id="applyBtn">적용</button>
-    </form>
+    <div id="status">준비</div>
+    <div class="btn-group">
+        <button id="pauseBtn" disabled>⏸ 잠시멈춤</button>
+        <button id="startBtn">▶ 시작</button>
+        <button id="resumeBtn" disabled>⏵ 다시시작</button>
+    </div>
+
     <script>
         let workTime = 30 * 60; // 30분
         let breakTime = 5 * 60; // 5분
@@ -162,17 +83,12 @@
         let timeLeft = workTime;
         let isWorking = true;
         let isPaused = false;
-        let isRunning = false;
 
         const statusDiv = document.getElementById('status');
         const timerDiv = document.getElementById('timer');
         const startBtn = document.getElementById('startBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         const resumeBtn = document.getElementById('resumeBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const workInput = document.getElementById('workInput');
-        const breakInput = document.getElementById('breakInput');
-        const applyBtn = document.getElementById('applyBtn');
 
         function updateTimerDisplay() {
             let min = Math.floor(timeLeft / 60);
@@ -198,8 +114,7 @@
                             startBtn.disabled = false;
                             pauseBtn.disabled = true;
                             resumeBtn.disabled = true;
-                            isRunning = false;
-                            timerDiv.textContent = `${Math.floor(workTime/60).toString().padStart(2, '0')}:00`;
+                            timerDiv.textContent = "30:00";
                         }
                     }
                 }
@@ -210,12 +125,10 @@
             startBtn.disabled = true;
             pauseBtn.disabled = false;
             resumeBtn.disabled = true;
-            resetBtn.disabled = false;
             statusDiv.textContent = "작업 중!";
             timeLeft = workTime;
             isWorking = true;
             isPaused = false;
-            isRunning = true;
             updateTimerDisplay();
             runTimer();
         }
@@ -234,42 +147,10 @@
             statusDiv.textContent = isWorking ? "작업 중!" : "휴식 시간!";
         }
 
-        function resetTimer() {
-            clearInterval(timer);
-            isPaused = false;
-            isRunning = false;
-            startBtn.disabled = false;
-            pauseBtn.disabled = true;
-            resumeBtn.disabled = true;
-            resetBtn.disabled = false;
-            statusDiv.textContent = "준비";
-            timeLeft = workTime;
-            updateTimerDisplay();
-        }
-
-        function applySettings() {
-            let workVal = parseInt(workInput.value, 10);
-            let breakVal = parseInt(breakInput.value, 10);
-            if (isNaN(workVal) || workVal < 1) workVal = 30;
-            if (isNaN(breakVal) || breakVal < 1) breakVal = 5;
-            workTime = workVal * 60;
-            breakTime = breakVal * 60;
-            if (!isRunning) {
-                timeLeft = workTime;
-                updateTimerDisplay();
-            }
-        }
-
         startBtn.addEventListener('click', startTimer);
         pauseBtn.addEventListener('click', pauseTimer);
         resumeBtn.addEventListener('click', resumeTimer);
-        resetBtn.addEventListener('click', resetTimer);
-        applyBtn.addEventListener('click', applySettings);
 
-        // 초기 상태
-        pauseBtn.disabled = true;
-        resumeBtn.disabled = true;
-        resetBtn.disabled = false;
         updateTimerDisplay();
     </script>
 </body>
