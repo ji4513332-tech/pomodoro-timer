@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>집중타이머</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fffbe6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 440px;
+            height: 440px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 32px;
+            box-shadow: 0 8px 32px rgba(255, 111, 97, 0.13);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .tomato-emoji {
+            font-size: 70px;
+            margin-top: 24px;
+            margin-bottom: 0;
+            text-align: center;
+            width: 100%;
+            z-index: 1;
+        }
+        .title {
+            margin-top: 8px;
+            margin-bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #222;
+            letter-spacing: 2px;
+        }
+        .timer-box {
+            margin: 16px auto 0 auto;
+            width: 320px;
+            background: rgba(255,251,230,0.95);
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(255, 111, 97, 0.08);
+            padding: 18px 0 10px 0;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #timer {
+            font-size: 44px;
+            font-weight: bold;
+            color: #ff6f61;
+            text-shadow: 2px 2px 8px #ffd6d6;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        #status {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #d84315;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: nowrap;
+        }
+        button {
+            font-size: 15px;
+            padding: 7px 16px;
+            border: none;
+            border-radius: 24px;
+            background: #ff6f61;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 111, 97, 0.15);
+            transition: background 0.2s;
+        }
+        button:disabled {
+            background: #ffc1b3;
+            color: #eee;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background: #d84315;
+        }
+        .settings {
+            margin-top: 10px;
+            background: #fffbe6;
+            border-radius: 12px;
+            padding: 10px 8px;
+            box-shadow: 0 1px 4px rgba(255, 111, 97, 0.07);
+            font-size: 14px;
+            width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .settings-row {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .settings label {
+            margin-right: 4px;
+            color: #d84315;
+        }
+        .settings input[type="number"] {
+            width: 40px;
+            padding: 3px;
+            border-radius: 6px;
+            border: 1px solid #ffd6d6;
+            font-size: 14px;
+            text-align: center;
+        }
+        @media (max-width: 500px) {
+            .container {
+                width: 98vw;
+                height: 98vw;
+                min-width: 240px;
+                min-height: 240px;
+            }
+            .timer-box, .settings {
+                width: 90vw;
+                max-width: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tomato-emoji">🍅</div>
+        <div class="title">집중타이머</div>
+        <div class="timer-box">
+            <div id="status">준비</div>
+            <div id="timer">30:00</div>
+            <div class="btn-group">
+                <button id="pauseBtn" disabled>⏸ 멈춤</button>
+                <button id="startBtn">▶ 시작</button>
+                <button id="resumeBtn" disabled>⏵ 다시시작</button>
+                <button id="resetBtn">🔄 리셋</button>
+            </div>
+            <form class="settings" id="settingsForm" autocomplete="off" onsubmit="return false;">
+                <div class="settings-row">
+                    <label for="workInput">작업(분)</label>
+                    <input type="number" id="workInput" min="1" max="120" value="30">
+                    <label for="breakInput">휴식(분)</label>
+                    <input type="number" id="breakInput" min="1" max="60" value="5">
+                </div>
+                <button id="applyBtn">적용</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        let workTime = 30 * 60; // 30분
+        let breakTime = 5 * 60; // 5분
+        let timer;
+        let timeLeft = workTime;
+        let isWorking = true;
+        let isPaused = false;
+        let isRunning = false;
+
+        const statusDiv = document.getElementById('status');
+        const timerDiv = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const workInput = document.getElementById('workInput');
+        const breakInput = document.getElementById('breakInput');
+        const applyBtn = document.getElementById('applyBtn');
+
+        function updateTimerDisplay() {
+            let min = Math.floor(timeLeft / 60);
+            let sec = timeLeft % 60;
+            timerDiv.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        function runTimer() {
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        if (isWorking) {
+                            statusDiv.textContent = "휴식 시간!";
+                            timeLeft = breakTime;
+                            isWorking = false;
+                            updateTimerDisplay();
+                            runTimer();
+                        } else {
+                            statusDiv.textContent = "완료! 다시 시작하세요.";
+                            startBtn.disabled = false;
+                            pauseBtn.disabled = true;
+                            resumeBtn.disabled = true;
+                            isRunning = false;
+                            timerDiv.textContent = `${Math.floor(workTime/60).toString().padStart(2, '0')}:00`;
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        function startTimer() {
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            resumeBtn.disabled = true;
+            resetBtn.disabled = false;
+            statusDiv.textContent = "작업 중!";
+            timeLeft = workTime;
+            isWorking = true;
+            isPaused = false;
+            isRunning = true;
+            updateTimerDisplay();
+            runTimer();
+        }
+
+        function pauseTimer() {
+            isPaused = true;
+            pauseBtn.disabled = true;
+            resumeBtn.disabled = false;
+            statusDiv.textContent = isWorking ? "작업 멈춤!" : "휴식 멈춤!";
+        }
+
+        function resumeTimer() {
+            isPaused = false;
+            pauseBtn.disabled = false;
+            resumeBtn.disabled = true;
+            statusDiv.textContent = isWorking ? "작업 중!" : "휴식 시간!";
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            isPaused = false;
+            isRunning = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            resumeBtn.disabled = true;
+            resetBtn.disabled = false;
+            statusDiv.textContent = "준비";
+            timeLeft = workTime;
+            updateTimerDisplay();
+        }
+
+        function applySettings() {
+            let workVal = parseInt(workInput.value, 10);
+            let breakVal = parseInt(breakInput.value, 10);
+            if (isNaN(workVal) || workVal < 1) workVal = 30;
+            if (isNaN(breakVal) || breakVal < 1) breakVal = 5;
+            workTime = workVal * 60;
+            breakTime = breakVal * 60;
+            if (!isRunning) {
+                timeLeft = workTime;
+                updateTimerDisplay();
+            }
+        }
+
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resumeBtn.addEventListener('click', resumeTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        applyBtn.addEventListener('click', applySettings);
+
+        // 초기 상태
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = true;
+        resetBtn.disabled = false;
+        updateTimerDisplay();
+    </script>
+</body>
+</html>
