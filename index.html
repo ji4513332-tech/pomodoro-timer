@@ -11,32 +11,33 @@
             padding: 0;
         }
         .container {
-            max-width: 350px;
+            width: 700px;
+            height: 320px;
             margin: 60px auto 0 auto;
             background: #fff;
             border-radius: 24px;
             box-shadow: 0 8px 32px rgba(255, 111, 97, 0.13);
-            padding: 32px 24px 24px 24px;
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             position: relative;
         }
-        h1 {
-            text-align: center;
-            margin-top: 30px;
-            margin-bottom: 10px;
-            font-size: 2rem;
-            color: #d84315;
-            z-index: 2;
-            position: relative;
+        .left-box {
+            flex: 0 0 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .tomato {
             width: 120px;
             height: 120px;
             background: radial-gradient(circle at 60% 40%, #ff6f61 80%, #d84315 100%);
             border-radius: 50%;
-            margin: 0 auto 18px auto;
             position: relative;
             box-shadow: 0 8px 24px rgba(255, 111, 97, 0.2);
-            z-index: 1;
+            margin-bottom: 10px;
         }
         .stem {
             width: 18px;
@@ -48,12 +49,20 @@
             border-radius: 20px 20px 0 0;
             transform: rotate(-15deg);
         }
+        .center-box {
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
         .timer-box {
             background: #fffbe6;
             border-radius: 16px;
             box-shadow: 0 2px 8px rgba(255, 111, 97, 0.08);
             padding: 18px 0 10px 0;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
+            width: 220px;
         }
         #status {
             font-size: 20px;
@@ -72,7 +81,7 @@
             display: flex;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         button {
             font-size: 16px;
@@ -92,13 +101,20 @@
         button:hover:not(:disabled) {
             background: #d84315;
         }
+        .right-box {
+            flex: 0 0 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
         .settings {
-            margin-top: 18px;
             background: #fffbe6;
             border-radius: 12px;
             padding: 12px 10px;
             box-shadow: 0 1px 4px rgba(255, 111, 97, 0.07);
             font-size: 15px;
+            width: 200px;
         }
         .settings label {
             margin-right: 8px;
@@ -113,31 +129,62 @@
             font-size: 15px;
             text-align: center;
         }
+        @media (max-width: 800px) {
+            .container {
+                flex-direction: column;
+                width: 98vw;
+                height: auto;
+                padding: 18px 6vw;
+            }
+            .left-box, .center-box, .right-box {
+                width: 100%;
+                margin-bottom: 12px;
+            }
+            .settings, .timer-box {
+                width: 98vw;
+                max-width: 320px;
+            }
+        }
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 2rem;
+            color: #d84315;
+            z-index: 2;
+            position: relative;
+        }
     </style>
 </head>
 <body>
     <h1>🍅 뽀모도로 타이머</h1>
     <div class="container">
-        <div class="tomato">
-            <div class="stem"></div>
-        </div>
-        <div class="timer-box">
-            <div id="status">준비</div>
-            <div id="timer">30:00</div>
-            <div class="btn-group">
-                <button id="pauseBtn" disabled>⏸ 잠시멈춤</button>
-                <button id="startBtn">▶ 시작</button>
-                <button id="resumeBtn" disabled>⏵ 다시시작</button>
-                <button id="resetBtn">🔄 리셋</button>
+        <div class="left-box">
+            <div class="tomato">
+                <div class="stem"></div>
             </div>
         </div>
-        <form class="settings" id="settingsForm" autocomplete="off" onsubmit="return false;">
-            <label for="workInput">작업(분)</label>
-            <input type="number" id="workInput" min="1" max="120" value="30">
-            <label for="breakInput">휴식(분)</label>
-            <input type="number" id="breakInput" min="1" max="60" value="5">
-            <button id="applyBtn">적용</button>
-        </form>
+        <div class="center-box">
+            <div class="timer-box">
+                <div id="status">준비</div>
+                <div id="timer">30:00</div>
+                <div class="btn-group">
+                    <button id="pauseBtn" disabled>⏸ 잠시멈춤</button>
+                    <button id="startBtn">▶ 시작</button>
+                    <button id="resumeBtn" disabled>⏵ 다시시작</button>
+                    <button id="resetBtn">🔄 리셋</button>
+                </div>
+            </div>
+        </div>
+        <div class="right-box">
+            <form class="settings" id="settingsForm" autocomplete="off" onsubmit="return false;">
+                <label for="workInput">작업(분)</label>
+                <input type="number" id="workInput" min="1" max="120" value="30">
+                <label for="breakInput">휴식(분)</label>
+                <input type="number" id="breakInput" min="1" max="60" value="5">
+                <button id="applyBtn">적용</button>
+            </form>
+        </div>
     </div>
     <script>
         let workTime = 30 * 60; // 30분
